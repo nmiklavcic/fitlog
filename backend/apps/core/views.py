@@ -5,6 +5,11 @@ from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 
 
+def csrf_failure(request, reason=""):
+    """JSON instead of Django's HTML page, so the SPA can show a useful error."""
+    return JsonResponse({"detail": "CSRF check failed. Reload the page and try again."}, status=403)
+
+
 @never_cache
 def health(request):
     """Readiness check for load balancers / uptime monitors.

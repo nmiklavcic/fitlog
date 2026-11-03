@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_prometheus",
     "apps.core",
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
@@ -134,6 +135,7 @@ SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SECURE = not DEBUG
+CSRF_FAILURE_VIEW = "apps.core.views.csrf_failure"
 
 # --- Security headers (Nginx terminates TLS and sets X-Forwarded-Proto) -------
 
@@ -150,7 +152,7 @@ X_FRAME_OPTIONS = "DENY"
 
 # --- Auth ---------------------------------------------------------------------
 
-# AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "accounts.User"
 
 # Argon2id first (memory-hard, winner of the Password Hashing Competition);
 # PBKDF2 stays as a fallback so old hashes can still be verified and upgraded.
