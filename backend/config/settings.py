@@ -64,6 +64,8 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.workouts",
     "apps.social",
+    "apps.billing",
+    "apps.insights",
 ]
 
 MIDDLEWARE = [
@@ -245,6 +247,11 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
 EMAIL_TIMEOUT = 10
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "Liftlog <no-reply@localhost>")
+
+# --- Payments (Stripe test mode; leave empty for demo billing) ----------------
+
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET", "")
 
 # --- Internationalisation -----------------------------------------------------
 

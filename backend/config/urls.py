@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django_prometheus import exports
 
+from apps.billing.webhooks import stripe_webhook
 from apps.core import views as core_views
 
 api_patterns = [
@@ -10,6 +11,9 @@ api_patterns = [
     path("auth/", include("apps.accounts.urls")),
     path("", include("apps.workouts.urls")),
     path("", include("apps.social.urls")),
+    path("billing/", include("apps.billing.urls")),
+    path("billing/webhook/", stripe_webhook, name="stripe-webhook"),
+    path("", include("apps.insights.urls")),
 ]
 
 urlpatterns = [

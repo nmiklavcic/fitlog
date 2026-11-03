@@ -18,6 +18,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from apps.billing.services import cancel_for_account_deletion
 from apps.core.images import delete_photo_if_unused, process_upload
 from apps.core.metrics import LOGINS, SIGNUPS
 from apps.core.utils import client_ip
@@ -355,6 +356,15 @@ class DeleteAccountView(APIView):
             code = str(request.data.get("code", ""))
             if not (totp.verify_code(user, code) or totp.use_recovery_code(user, code)):
                 return Response({"code": ["Enter a valid two-factor code."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            cancel_for_account_deletion(user)  # stop Stripe billing first
+        except Exception:  # noqa: BLE001
+            security_log.exception("account_delete_billing_failed", extra={"event": "account_delete_billing_failed", "user_id": user.pk})
+            return Response(
+                {"detail": "We couldn't cancel your subscription. Nothing was deleted; try again later."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
 
         user_id, avatar_id = user.pk, user.avatar_id
         with transaction.atomic():
