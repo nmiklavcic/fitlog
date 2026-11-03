@@ -21,7 +21,8 @@ export default function Register() {
   });
   const errors = fieldErrors(register.error);
 
-  if (user) return <Navigate to="/" replace />;
+  // Already logged in (but not because we just signed up: that navigates to /log itself).
+  if (user && !register.isSuccess) return <Navigate to="/" replace />;
 
   return (
     <AuthShell

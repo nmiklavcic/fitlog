@@ -69,7 +69,8 @@ export default function Recap() {
             </p>
             <p className="mt-1 text-2xl font-bold">{r.label}</p>
             <p className="mt-3 text-sm text-indigo-100">
-              {r.workouts} workouts on {r.active_days} days · {r.sets} sets · {r.reps.toLocaleString()} reps ·{" "}
+              {r.workouts} workout{r.workouts === 1 ? "" : "s"} on {r.active_days} day{r.active_days === 1 ? "" : "s"} · {r.sets} sets ·{" "}
+              {r.reps.toLocaleString()} reps ·{" "}
               {formatVolume(r.volume_kg, user.units)}
               {r.volume_change_pct !== null && ` (${r.volume_change_pct > 0 ? "+" : ""}${r.volume_change_pct}% vs. previous period)`}
             </p>

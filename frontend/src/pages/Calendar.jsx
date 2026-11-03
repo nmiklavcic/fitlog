@@ -78,7 +78,7 @@ export default function Calendar() {
                   onClick={() => setSelected(iso)}
                   aria-label={`${niceDate(iso)}: ${workouts.length} workouts`}
                   aria-pressed={selected === iso}
-                  className={`relative flex aspect-square flex-col items-center justify-center rounded-xl text-sm transition ${
+                  className={`relative flex h-11 flex-col items-center justify-center rounded-xl text-sm transition sm:h-14 ${
                     isSameMonth(day, month) ? "" : "opacity-35"
                   } ${active ? "bg-indigo-600 font-semibold text-white" : "hover:bg-zinc-100 dark:hover:bg-zinc-800"} ${
                     selected === iso ? "ring-2 ring-amber-400 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900" : ""

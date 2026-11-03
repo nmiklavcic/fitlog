@@ -53,7 +53,7 @@ function MuscleVolume({ units }) {
               <Tooltip contentStyle={{ borderRadius: 12 }} />
               <Legend formatter={muscleLabel} />
               {top.map((muscle, i) => (
-                <Bar key={muscle} dataKey={muscle} name={muscle} stackId="a" fill={COLORS[i % COLORS.length]} />
+                <Bar key={muscle} dataKey={muscle} name={muscle} stackId="a" fill={COLORS[i % COLORS.length]} isAnimationActive={false} />
               ))}
             </BarChart>
           </ResponsiveContainer>
@@ -67,10 +67,9 @@ function Heatmap({ units }) {
   const [year, setYear] = useState(new Date().getFullYear());
   const data = useQuery({ queryKey: ["insights", "heatmap", year], queryFn: () => api(`/analytics/heatmap/?year=${year}`) });
   const days = data.data?.days ?? {};
-  const volumes = Object.values(days).map((d) => d.volume_kg || 0).sort((a, b) => a - b);
-  const quantile = (q) => volumes[Math.floor(q * (volumes.length - 1))] ?? 0;
-  const thresholds = [quantile(0.25), quantile(0.5), quantile(0.75)];
-  const level = (volume) => (volume === undefined ? 0 : 1 + thresholds.filter((t) => volume > t).length);
+  // Shade 1-4 relative to your heaviest day of the year.
+  const maxVolume = Math.max(1, ...Object.values(days).map((d) => d.volume_kg || 0));
+  const level = (volume) => Math.min(4, Math.max(1, Math.ceil((volume / maxVolume) * 4)));
   const shades = ["bg-zinc-100 dark:bg-zinc-800", "bg-indigo-200", "bg-indigo-400", "bg-indigo-600", "bg-indigo-800"];
 
   const first = startOfWeek(new Date(year, 0, 1), { weekStartsOn: 1 });
@@ -86,7 +85,7 @@ function Heatmap({ units }) {
     <Card>
       <div className="mb-3 flex items-center justify-between">
         <h2 className="font-semibold">
-          {total} workouts in {year}
+          {total} workout{total === 1 ? "" : "s"} in {year}
         </h2>
         <div className="flex items-center gap-1">
           <Button size="icon" variant="ghost" onClick={() => setYear((y) => y - 1)} aria-label="Previous year">

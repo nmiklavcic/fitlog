@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Bell,
@@ -141,6 +141,7 @@ function TabLink({ to, icon: Icon, label, end }) {
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const unread = useUnreadCount(Boolean(user));
   const hasDraft = useHasDraft(user?.id);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -183,7 +184,7 @@ export default function Layout() {
       </Modal>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-5 pb-28 md:px-8 md:pt-8 md:pb-12">
-        {hasDraft && (
+        {hasDraft && pathname !== "/log" && (
           <Link
             to="/log"
             className="mb-4 flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm"

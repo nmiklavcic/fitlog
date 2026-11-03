@@ -201,12 +201,12 @@ export default function LogWorkout() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [problem, setProblem] = useState("");
 
-  const update = (change) =>
-    setDraft((current) => {
-      const next = typeof change === "function" ? change(current) : change;
-      saveDraft(user.id, next);
-      return next;
-    });
+  // Persist every change (in an effect, not inside the state updater: saving notifies
+  // the sidebar's "workout in progress" banner, which must not update mid-render).
+  useEffect(() => {
+    if (draft) saveDraft(user.id, draft);
+  }, [draft, user.id]);
+  const update = (change) => setDraft((current) => (typeof change === "function" ? change(current) : change));
 
   const save = useMutation({
     mutationFn: (payload) =>

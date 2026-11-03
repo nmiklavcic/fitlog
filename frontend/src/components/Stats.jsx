@@ -37,7 +37,15 @@ export function WorkoutStats({ stats, units }) {
               {exercise.is_pr && <Badge tone="amber">PR</Badge>}
             </span>
             <span className="shrink-0 text-zinc-500">
-              {exercise.sets} × {exercise.best_set ? `${formatWeight(exercise.best_set.weight_kg, units)} × ${exercise.best_set.reps}` : "-"}
+              {exercise.sets} {exercise.sets === 1 ? "set" : "sets"}
+              {exercise.best_set && (
+                <>
+                  {" · best "}
+                  <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                    {formatWeight(exercise.best_set.weight_kg, units)} × {exercise.best_set.reps}
+                  </span>
+                </>
+              )}
             </span>
           </li>
         ))}

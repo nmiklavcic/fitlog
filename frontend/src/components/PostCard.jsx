@@ -8,7 +8,7 @@ import { timeAgo } from "../lib/format";
 import { RecapStats, WorkoutStats } from "./Stats";
 import { Avatar, Badge, Button, ErrorBox, Input } from "./ui";
 
-function Comments({ post }) {
+function Comments({ post, onCountChange }) {
   const queryClient = useQueryClient();
   const [body, setBody] = useState("");
   const key = ["comments", post.id];
@@ -18,11 +18,15 @@ function Comments({ post }) {
     onSuccess: (comment) => {
       setBody("");
       queryClient.setQueryData(key, (old = []) => [...old, comment]);
+      onCountChange(1);
     },
   });
   const remove = useMutation({
     mutationFn: (id) => api(`/comments/${id}/`, { method: "DELETE" }),
-    onSuccess: (_, id) => queryClient.setQueryData(key, (old = []) => old.filter((c) => c.id !== id)),
+    onSuccess: (_, id) => {
+      queryClient.setQueryData(key, (old = []) => old.filter((c) => c.id !== id));
+      onCountChange(-1);
+    },
   });
 
   return (
@@ -75,6 +79,7 @@ export default function PostCard({ post, onDeleted }) {
   const [liked, setLiked] = useState(post.liked_by_me);
   const [likes, setLikes] = useState(post.like_count);
   const [showComments, setShowComments] = useState(false);
+  const [commentCount, setCommentCount] = useState(post.comment_count);
 
   const like = useMutation({
     mutationFn: (on) => api(`/posts/${post.id}/like/`, { method: on ? "POST" : "DELETE" }),
@@ -159,7 +164,7 @@ export default function PostCard({ post, onDeleted }) {
             aria-expanded={showComments}
           >
             <MessageCircle className="size-6" />
-            {post.comment_count}
+            {commentCount}
           </button>
           {post.workout_id && (
             <Link to={`/workouts/${post.workout_id}`} className="ml-auto text-sm text-indigo-600 hover:underline dark:text-indigo-400">
@@ -177,7 +182,7 @@ export default function PostCard({ post, onDeleted }) {
         ) : (
           <RecapStats stats={post.stats} units={user.units} />
         )}
-        {showComments && <Comments post={post} />}
+        {showComments && <Comments post={post} onCountChange={(delta) => setCommentCount((n) => n + delta)} />}
         <ErrorBox error={remove.error || like.error} />
       </div>
     </article>

@@ -102,7 +102,7 @@ def start_demo(user, plan):
         },
     )
     logger.info("demo_subscription_started", extra={"event": "demo_subscription_started", "user_id": user.pk, "plan": plan})
-    return f"{settings.PUBLIC_BASE_URL}/premium/success?demo=1"
+    return "/premium/success?demo=1"  # stays inside the app (Stripe needs absolute URLs, we don't)
 
 
 def portal_url(user):
