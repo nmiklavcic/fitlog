@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+backend/staticfiles/
+backend/media/
+
+# Node
+node_modules/
+frontend/dist/
+
+# Local secrets / env overrides (backend/dev.env is dev-only and committed on purpose)
+*.env.local
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

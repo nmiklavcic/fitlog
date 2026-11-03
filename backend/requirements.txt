@@ -1,0 +1,12 @@
+# Pinned backend dependencies (pip install -r requirements.txt inside a virtualenv)
+Django==5.2.18
+djangorestframework==3.18.3
+psycopg[binary]==3.3.7
+redis==8.1.0
+argon2-cffi==25.1.0
+Pillow==13.0.0
+pyotp==2.10.0
+stripe==16.1.0
+django-prometheus==2.5.0
+prometheus-client==0.26.0
+gunicorn==26.2.0
