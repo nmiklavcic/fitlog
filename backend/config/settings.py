@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "django_prometheus",
     "apps.core",
     "apps.accounts",
+    "apps.workouts",
 ]
 
 MIDDLEWARE = [
@@ -198,6 +199,8 @@ REST_FRAMEWORK = {
     # Nginx is the only proxy in front of Gunicorn: DRF takes the client IP from
     # the last X-Forwarded-For entry, the one Nginx appended.
     "NUM_PROXIES": 1,
+    # Return decimals (weights) as JSON numbers instead of strings.
+    "COERCE_DECIMAL_TO_STRING": False,
 }
 
 # --- Static files and uploaded media -------------------------------------------
