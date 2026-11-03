@@ -6,9 +6,15 @@ import { useAuth } from "./hooks/useAuth";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import { ForgotPassword, ResetPassword } from "./pages/auth/PasswordReset";
+import Calendar from "./pages/Calendar";
 import Explore from "./pages/Explore";
 import Feed from "./pages/Feed";
+import LogWorkout from "./pages/LogWorkout";
 import PostPage from "./pages/PostPage";
+import Progress from "./pages/Progress";
+import Share from "./pages/Share";
+import Templates from "./pages/Templates";
+import WorkoutDetail from "./pages/WorkoutDetail";
 
 function RequireAuth() {
   const { user, loading } = useAuth();
@@ -39,6 +45,12 @@ export default function App() {
         <Route index element={<Feed />} />
         <Route path="explore" element={<Explore />} />
         <Route path="p/:id" element={<PostPage />} />
+        <Route path="log" element={<LogWorkout />} />
+        <Route path="share/:id" element={<Share />} />
+        <Route path="calendar" element={<Calendar />} />
+        <Route path="workouts/:id" element={<WorkoutDetail />} />
+        <Route path="progress" element={<Progress />} />
+        <Route path="templates" element={<Templates />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
