@@ -1,0 +1,49 @@
+# /etc/systemd/system/liftlog-gunicorn.service (reference)
+#   systemctl daemon-reload && systemctl enable --now liftlog-gunicorn
+#   journalctl -u liftlog-gunicorn -f -o cat       # JSON log lines (pipe to jq)
+[Unit]
+Description=Liftlog API (Django on Gunicorn)
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+
+[Service]
+Type=notify
+NotifyAccess=main
+User=liftlog
+Group=liftlog
+WorkingDirectory=/opt/liftlog/backend
+EnvironmentFile=/etc/liftlog/liftlog.env
+# Per-worker metric files (Prometheus multiprocess mode); /run/liftlog is created below.
+Environment=PROMETHEUS_MULTIPROC_DIR=/run/liftlog/prometheus
+RuntimeDirectory=liftlog
+ExecStart=/opt/liftlog/backend/.venv/bin/gunicorn -c gunicorn.conf.py config.wsgi
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=35
+
+# --- Sandboxing: the process can read the system but write only its media folder ---
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/liftlog/media
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

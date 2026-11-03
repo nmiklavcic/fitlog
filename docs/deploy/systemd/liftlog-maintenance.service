@@ -1,0 +1,19 @@
+# /etc/systemd/system/liftlog-maintenance.service (reference): run by liftlog-maintenance.timer.
+#   systemctl start liftlog-maintenance     # run it now
+[Unit]
+Description=Liftlog daily maintenance (unused photos, finished challenges)
+After=postgresql.service redis-server.service
+
+[Service]
+Type=oneshot
+User=liftlog
+Group=liftlog
+WorkingDirectory=/opt/liftlog/backend
+EnvironmentFile=/etc/liftlog/liftlog.env
+ExecStart=/opt/liftlog/backend/.venv/bin/python manage.py cleanup_media
+ExecStart=/opt/liftlog/backend/.venv/bin/python manage.py finish_challenges
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/liftlog/media
+ProtectHome=true
+PrivateTmp=true

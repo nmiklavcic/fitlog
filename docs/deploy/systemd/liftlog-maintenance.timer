@@ -1,0 +1,13 @@
+# /etc/systemd/system/liftlog-maintenance.timer (reference)
+#   systemctl enable --now liftlog-maintenance.timer
+#   systemctl list-timers liftlog-maintenance.timer
+[Unit]
+Description=Run Liftlog maintenance daily
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
