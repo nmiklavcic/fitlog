@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.workouts",
+    "apps.social",
 ]
 
 MIDDLEWARE = [

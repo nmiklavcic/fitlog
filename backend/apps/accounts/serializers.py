@@ -9,6 +9,8 @@ from apps.core.signing import photo_urls
 from .models import User
 
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_.]{3,30}$")
+# Names that would clash with URLs or confuse people.
+RESERVED_USERNAMES = {"admin", "api", "me", "requests", "settings", "support", "liftlog", "root", "staff"}
 
 
 def check_password_strength(password, user, field="password"):
@@ -85,7 +87,7 @@ class RegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 "Use 3-30 characters: letters, numbers, underscores and dots."
             )
-        if User.objects.filter(username__iexact=value).exists():
+        if value.lower() in RESERVED_USERNAMES or User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError("This username is taken.")
         return value
 

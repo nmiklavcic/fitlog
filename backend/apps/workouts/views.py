@@ -14,7 +14,7 @@ from apps.core.permissions import require_premium
 
 from .models import Exercise, TemplateExercise, Workout, WorkoutExercise, WorkoutTemplate
 from .serializers import ExerciseSerializer, TemplateSerializer, WorkoutSerializer
-from .services import exercise_progress, last_session
+from .services import exercise_progress, last_session, workout_summary
 
 SEARCH_LIMIT = 40
 SEARCH_CACHE_SECONDS = 60 * 60
@@ -139,6 +139,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return (
             Workout.objects.filter(user=self.request.user)
+            .select_related("post")
             .prefetch_related("exercises__exercise", "exercises__sets")
         )
 
@@ -155,6 +156,15 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         serializer.save()
         WORKOUTS_LOGGED.inc()
 
+    def perform_update(self, serializer):
+        workout = serializer.save()
+        post = getattr(workout, "post", None)
+        if post is not None:
+            # Keep the stats card on the shared post in sync with the edited workout.
+            fresh = self.get_queryset().get(pk=workout.pk)
+            post.stats = workout_summary(fresh)
+            post.save(update_fields=["stats"])
+
     @action(detail=False)
     def calendar(self, request):
         """Workout days in a month: ?month=YYYY-MM -> {"days": {"2026-11-03": [...]}}."""
@@ -168,6 +178,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 set_count=Count("exercises__sets"),
                 volume=Sum(Cast(F("exercises__sets__weight_kg") * F("exercises__sets__reps"), FloatField())),
             )
+            .select_related("post")
             .order_by("performed_on", "created_at")
         )
         days = {}

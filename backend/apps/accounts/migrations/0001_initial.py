@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 ('totp_enabled', models.BooleanField(default=False)),
                 ('totp_last_step', models.BigIntegerField(blank=True, null=True)),
                 ('recovery_codes', models.JSONField(blank=True, default=list)),
-                ('avatar', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='core.photo')),
+                ('avatar', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='avatar_of', to='core.photo')),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
             ],

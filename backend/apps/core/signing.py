@@ -42,14 +42,17 @@ def signed_media_url(relative_path, now=None):
     return f"{uri}?e={expires}&s={_signature(uri, expires)}"
 
 
-def verify(uri, expires, signature, now=None):
+def check(uri, expires, signature, now=None):
+    """'ok', 'invalid' (Nginx: 403) or 'expired' (Nginx: 410), mirroring secure_link."""
     try:
         expires = int(expires)
     except (TypeError, ValueError):
-        return False
+        return "invalid"
+    if not hmac.compare_digest(_signature(uri, expires), signature or ""):
+        return "invalid"
     if expires < (now if now is not None else time.time()):
-        return False
-    return hmac.compare_digest(_signature(uri, expires), signature or "")
+        return "expired"
+    return "ok"
 
 
 def photo_urls(photo):

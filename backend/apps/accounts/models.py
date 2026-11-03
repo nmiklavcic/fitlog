@@ -18,7 +18,7 @@ class User(AbstractUser):
     email = models.EmailField("email address")
     bio = models.CharField(max_length=300, blank=True)
     avatar = models.ForeignKey(
-        "core.Photo", null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+        "core.Photo", null=True, blank=True, on_delete=models.SET_NULL, related_name="avatar_of"
     )
     # Privacy by default: new accounts are private until the user opts in.
     is_public = models.BooleanField(default=False)

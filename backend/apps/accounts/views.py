@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from apps.core.images import delete_photo_if_unused, process_upload
 from apps.core.metrics import LOGINS, SIGNUPS
 from apps.core.utils import client_ip
 
@@ -151,3 +152,25 @@ class PasswordChangeView(APIView):
         update_session_auth_hash(request, request.user)
         security_log.info("password_changed", extra={"event": "password_changed", "user_id": request.user.pk})
         return Response({"detail": "Password changed."})
+
+
+class MeAvatarView(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "upload"
+
+    def post(self, request):
+        photo = process_upload(request.FILES.get("photo"))
+        old_photo_id = request.user.avatar_id
+        request.user.avatar = photo
+        request.user.save(update_fields=["avatar"])
+        if old_photo_id and old_photo_id != photo.pk:
+            delete_photo_if_unused(old_photo_id)
+        return me_response(request, request.user)
+
+    def delete(self, request):
+        old_photo_id = request.user.avatar_id
+        request.user.avatar = None
+        request.user.save(update_fields=["avatar"])
+        if old_photo_id:
+            delete_photo_if_unused(old_photo_id)
+        return me_response(request, request.user)

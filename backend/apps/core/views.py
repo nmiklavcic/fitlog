@@ -1,8 +1,13 @@
+from pathlib import Path
+
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
-from django.http import JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
+from django.utils._os import safe_join
 from django.views.decorators.cache import never_cache
+
+from . import signing
 
 
 def csrf_failure(request, reason=""):
@@ -35,3 +40,21 @@ def health(request):
         {"status": "ok" if healthy else "degraded", "checks": checks, "version": settings.APP_VERSION},
         status=200 if healthy else 503,
     )
+
+
+def signed_media(request, path):
+    """DEBUG-only stand-in for Nginx's secure_link location, so local dev behaves the same."""
+    result = signing.check(request.path, request.GET.get("e"), request.GET.get("s"))
+    if result == "invalid":
+        return HttpResponse("Forbidden", status=403)
+    if result == "expired":
+        return HttpResponse("Link expired", status=410)
+    try:
+        file_path = Path(safe_join(settings.MEDIA_ROOT, path))
+    except ValueError:  # path traversal attempt
+        raise Http404
+    if not file_path.is_file():
+        raise Http404
+    response = FileResponse(file_path.open("rb"), content_type="image/webp")
+    response["Cache-Control"] = "private, max-age=3600"
+    return response
